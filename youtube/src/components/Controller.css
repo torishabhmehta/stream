@@ -1,0 +1,80 @@
+
+
+.SearchBar{
+
+  margin-top: 30px;
+}
+
+#searchbar{
+
+  margin-bottom: 10px;
+  font-size: 30px;
+  text-align: center;
+  background-color: #FFFF99;
+}
+
+#GetVideos{
+  margin: 10px;
+  padding: 10ps 20px;
+  font-size: 30px;
+  background-color:		#414a4c;
+  width: 500px;
+  height: 50px;
+}
+#SearchResults{
+  float: right;
+  border: 10px solid #222;
+  font-size: 20px;
+  visibility: hidden;
+  overflow:hidden;
+  width: 30%;
+  height:700px;
+  margin-right: 20px;
+  background-color: #222;
+  align-items: center;
+  align-content: center;
+  align-self: center;
+}
+
+#SearchResults h1{
+  background-color: #222;
+  color: #FFFFFF;
+  border-bottom: 5px solid #a4b0be;
+  padding-bottom: 30px;
+
+}
+
+.vid-thumb {
+      float:left;
+			margin-right: 8px;
+		}
+
+#SearchResults:hover,#SearchResults:focus{
+  overflow-y: auto;
+}
+
+ul{
+  list-style-type: none;
+  margin:0;
+  padding:0;
+  background: #222;
+}
+li a{
+  text-decoration: none;
+  background-color: #222;
+  height:55px;
+  display:block;
+  padding:10px;
+}
+li a:hover {
+  background-color:#666666
+  }
+  #vid-list .desc {
+  			color: #CACACA;
+  			font-size: 13px;
+  			margin-top:5px;
+
+}
+#GetMore{
+  visibility: hidden;
+}
