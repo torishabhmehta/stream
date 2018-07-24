@@ -1,19 +1,19 @@
-from channels.generic.websocket import AsyncWebsocketConsumer
+from channels.generic.websocket import AsyncWebsocketConsumer 
 import json
 
 class PlayerConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-	    await self.channel_layer.group_add(
+            await self.channel_layer.group_add(
                 "stream",
                 self.channel_name
                 )
-	    await self.accept()
+            await self.accept()
 
     async def disconnect(self, close_code):
-	    await self.channel_layer.group_discard(
+            await self.channel_layer.group_discard(
                 "stream",
-	        self.channel_name
-	    )
+                self.channel_name
+            )
 
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
@@ -33,10 +33,10 @@ class PlayerConsumer(AsyncWebsocketConsumer):
             'duration': duration,
             'volume': volume,
             'seeking': seeking,
-	    }
-	)
+            }
+        )
 
-    async def web_stream(self, event):
+async def web_stream(self, event):
         url = event['url']
         played = event['played']
         muted = event['muted']
@@ -44,10 +44,10 @@ class PlayerConsumer(AsyncWebsocketConsumer):
         duration = event['duration']
         volume = event['volume']
         await self.send(text_data=json.dumps({
-    	    'url': url,
-    	    'played': played,
-    	    'muted': muted,
-    	    'duration': duration,
-    	    'volume': volume,
+            'url': url,
+            'played': played,
+            'muted': muted,
+            'duration': duration,
+            'volume': volume,
             'seeking': seeking,
-    	}))
+        }))
