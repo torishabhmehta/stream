@@ -31,6 +31,7 @@ class Player extends Component {
           duration: data['duration'],
           volume: data['volume'],
           seeking: data['seeking'],
+          playing: data['playing'],
       })
         if(this.state.seeking){
           this.setState({played: data['played'],})
@@ -47,6 +48,7 @@ class Player extends Component {
           duration: this.state.duration,
           volume: this.state.volume,
           seeking: this.state.seeking,
+          playing: this.state.playing
       }
             streamSocket.send(JSON.stringify(data));
   }
@@ -71,6 +73,7 @@ class Player extends Component {
         <div id="player_wrapper">
            <div id="player">
              <ReactPlayer
+             id="r_player"
              ref={this.ref}
                  url={url}
                  playbackRate={playbackRate}
@@ -80,7 +83,8 @@ class Player extends Component {
                  onError={e => console.log('onError', e)}
                  onProgress={this.onProgress}
       //             onDuration={this.onDuration}
-                 playing  />
+                 playing = {playing} />
+                <div class="overlay"></div>
            </div>
           </div>
         </body>

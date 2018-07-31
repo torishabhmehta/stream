@@ -8,7 +8,7 @@ export function createApiMiddleware() {
   let postponedRSAAs = []
 
   return ({ dispatch, getState }) => {
-    const rsaaMiddleware = apiMiddleware({dispatch, getState})
+    const rsaaMiddleware = apiMiddleware({dispatch, getState});
 
     return (next) => (action) => {
       const nextCheckPostoned = (nextAction) => {

@@ -1,6 +1,8 @@
 import React, {Component} from 'react'
 import { Alert, Button, Jumbotron,  Form } from 'reactstrap';
 import TextInput from './TextInput'
+import 'bootstrap/dist/css/bootstrap.css';
+import './lform.css';
 export default class LoginForm extends Component {
   state = {
     username: '',
@@ -31,9 +33,11 @@ export default class LoginForm extends Component {
                 {errors.non_field_errors}
              </Alert>:""
           }
+          
           <TextInput name="username" label="Username"
                      error={errors.username}
-                     onChange={this.handleInputChange}/>
+                     onChange={this.handleInputChange}
+                     color="#FFFFFF"/>
           <TextInput name="password" label="Password"
                      error={errors.password} type="password"
                      onChange={this.handleInputChange}/>

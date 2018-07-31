@@ -1,7 +1,10 @@
 import React, {Component} from 'react';
 import './Controller.css'
 import { streamSocket } from './websocket.js';
-
+import Button from '@material-ui/core/Button';
+import 'typeface-roboto'
+import AddIcon from '@material-ui/icons/Add';
+import volume_off from '@material-ui/icons';
 const API='AIzaSyALsePfmVRgtvFqd7eSjBOSM7UL_Ti2YW4'
 var resultNo=10;
 
@@ -27,7 +30,10 @@ export class Controller extends React.Component {
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleMore = this.handleMore.bind(this);
     this.send_data = this.send_data.bind(this);
-
+    this.logout=this.logout.bind(this);
+    this.toggleMuted=this.toggleMuted.bind(this);
+    this.playToggle=this.playToggle.bind(this);
+    this.handleKeyPress = this.handleKeyPress.bind(this);
 }
 
   componentDidMount() {
@@ -38,33 +44,13 @@ export class Controller extends React.Component {
           muted: data['muted'],
           duration: data['duration'],
           volume: data['volume'],
-          played: data['played']
+          played: data['played'],
+          playing: data['playing'],
         })
     }
   }
 
-  load = url => {
-    this.setState({
-      url,
-      played: 0,
-      loaded: 0
-    })
-  }
 
-  playPause = () => {
-    this.setState({ playing: !this.state.playing });
-    this.send_data();
-  }
-
-  stop = () => {
-    this.setState({ url: null, playing: false });
-    this.send_data();
-  }
-
-  toggleLoop = () => {
-    this.setState({ loop: !this.state.loop });
-    this.send_data();
-  }
 
   send_data = e =>{
     let data = {
@@ -74,6 +60,7 @@ export class Controller extends React.Component {
           duration: this.state.duration,
           volume: this.state.volume,
           seeking: this.state.seeking,
+          playing: this.state.playing,
         }
         streamSocket.send(JSON.stringify(data));
   }
@@ -82,24 +69,37 @@ export class Controller extends React.Component {
     this.setState({ volume: parseFloat(e.target.value) });
   }
 
+  logout = e => {
+    localStorage.clear();
+    document.location.reload();
+  }
+
   onVolumeMouseUp = e => {
     this.send_data();
   }
 
   toggleMuted = () => {
-    this.setState({ muted: !this.state.muted });
-    this.send_data();
+    this.setState({ muted: !this.state.muted },()=>
+    {this.send_data()});
+    if(this.state.muted){
+    document.getElementById('mute').innerHTML='<i class="material-icons">volume_off</i>'; 
+    document.getElementById('mute1').innerHTML='mute'}
+    else{
+      document.getElementById('mute').innerHTML='<i class="material-icons">volume_up</i>';
+      document.getElementById('mute1').innerHTML='unmute'
+    }
   }
 
-  setPlaybackRate = e => {
-    this.setState({ playbackRate: parseFloat(e.target.value) });
-    this.send_data();
-  }
-
-  onPlay = () => {
-    console.log('onPlay')
-    this.setState({ playing: true });
-    this.send_data();
+   playToggle = () => {
+    this.setState({ playing: !this.state.playing }, ()=>
+    {this.send_data()});
+    if(this.state.playing){
+    document.getElementById('play').innerHTML='<i class="material-icons">play_circle_filled</i>';
+    document.getElementById('pause1').innerHTML='play' }
+    else{
+      document.getElementById('play').innerHTML='<i class="material-icons">pause_circle_filled</i>';
+      document.getElementById('pause1').innerHTML='pause' 
+    }
   }
 
   onPause = () => {
@@ -130,16 +130,17 @@ export class Controller extends React.Component {
     this.setState({ duration })
   }
 
-  renderLoadButton = (url, label) => {
-    return (
-      <button onClick={() => this.load(url)}>
-        {label}
-      </button>
-    )
-  }
+  
 
   ref = player => {
     this.player = player
+  }
+  handleKeyPress(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      document.getElementById('GetVideos').click();
+
+    }
   }
 
   handleChange(event) {
@@ -148,6 +149,7 @@ export class Controller extends React.Component {
   }
 
   handleSubmit(event) {
+    document.getElementById('searchbar').value='';
     var message=this.state.value
     var finalURL = `https://www.googleapis.com/youtube/v3/search?part=snippet&order=viewCount&q=${message}&type=video&videoDefinition=high&key=${API}&maxResults=${resultNo}`;
     fetch(finalURL)
@@ -165,7 +167,7 @@ export class Controller extends React.Component {
              );
            }.bind(this)}>
                 <span className="vid-thumb"><img width="72" src={`https://img.youtube.com/vi/${obj.id.videoId}/default.jpg`} /></span>
-                <div className="desc">{obj.snippet.title}</div>
+                <div className="desc">{obj.snippet.title}</ div>
             </a>
           </li>
         );
@@ -173,7 +175,7 @@ export class Controller extends React.Component {
       })
       document.getElementById('SearchResults').style.visibility="visible";
       document.getElementById('GetMore').style.visibility="visible";
-      document.getElementById('searchbar').value='';
+      
       event.preventDefault();
     }
 
@@ -187,35 +189,52 @@ render() {
   const {playing, volume, muted, loop, played, loaded, duration, playbackRate } = this.state
   const SEPARATOR = ' · '
   return (
-    <div>
-      <h1>Welcome to X-stream</h1>
+    <div className="vid-main-wrapper clearfix">
+      <h1 style={{ fontSize : '72px'}}><i>Streams in the ocean</i></h1>
       <div className="SearchBar">
         <form>
-          <input type="text" value={this.state.value} onChange={this.handleChange} size="50" id="searchbar" />
+          <input type="text" value={this.state.value} onChange={this.handleChange} size="50" id="searchbar" onKeyPress={this.handleKeyPress} />
         </form>
       </div>
       <div className="GetVideos">
-        <button onClick={this.handleSubmit} id="GetVideos">Get Videos</button>
+        <Button onClick={this.handleSubmit}  variant="contained" color="primary" id="GetVideos">Get Videos</Button>
       </div>
       <div className="vid-container">
+          <div id="seeker">
             <input
                 type='range' min={0} max={1} step='any'
                 value={played}
                 onMouseDown={this.onSeekMouseDown}
                 onChange={this.onSeekChange}
-                onMouseUp={this.onSeekMouseUp}
+                onMouseUp={this.onSeekMouseUp} 
+                id="seeker1"
               />
+              <p>seeker</p>
+              </div>
             <input type='range' min={0} max={2} step='any' value={volume}
             onMouseDown={this.onVolumeMouseDown}
             onChange={this.onVolumeChange}
             onMouseUp={this.onVolumeMouseUp}
+            id="volume"
             />
+            <p>volume</p>
+            <Button variant="fab" color="primary" onClick={this.toggleMuted} id="mute">
+        <i class="material-icons">volume_off</i>
+      </Button>
+      <p id="mute1">mute</p>
+      <Button variant="fab" color="primary" onClick={this.playToggle} id="play">
+        <i class="material-icons">pause_circle_filled</i>
+      </Button>
+      <p id="pause1">pause</p>        
       </div>
       <div id="SearchResults">
         <h1>Results</h1>
         <ul>{this.state.searchQuery}</ul>
-        <button id="GetMore" onClick={this.handleMore}>Get More</button>
+        <Button id="GetMore" color="Primary" variant="contained" onClick={this.handleMore}>Get More</Button>
       </div>
+      <div id="logout">
+            <Button onClick={this.logout} color="Primary" variant="contained">Logout</Button>
+            </div>
     </div>
 
 
